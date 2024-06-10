@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Transactions;
+using Microsoft.AspNetCore.Mvc;
 using Zad10.Services;
 
 namespace Zad10;
@@ -16,21 +17,28 @@ public class DoctorController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddPrescription(PrescriptionRequestDto prescriptionRequestDto)
     {
-        try
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             await _doctorService.AddNewPrescription(prescriptionRequestDto);
-            return Ok();
+            
+            scope.Complete();
         }
-        catch (Exception e)
-        {
-            return BadRequest();
-        }
+
+        /*return Created();*/
+        return Ok();
+
     }
 
 
     [HttpGet("{patientId}")]
     public async Task<IActionResult> GetPatientDetails(int patientId)
     {
+
+        if (!await _doctorService.DoesPatientExist(patientId))
+        {
+            return NotFound();
+        }
+        
         var details = await _doctorService.GetPatientDetails(patientId);
 
         if (details == null)
