@@ -36,7 +36,7 @@ public class DoctorService : IDoctorService
             throw new ArgumentException("DueDate must be greater than or equal to Date.");
         }
 
-        // Check if patient exists, if not create a new one
+       
         var patient = await _context.Patients.FirstOrDefaultAsync(p => 
             p.FirstName == request.Patient.FirstName && 
             p.LastName == request.Patient.LastName &&
@@ -55,7 +55,7 @@ public class DoctorService : IDoctorService
             await _context.SaveChangesAsync();
         }
 
-        // Check if doctor exists
+        
         var doctor = await _context.Doctors.FindAsync(request.Doctor.IdDoctor);
         if (doctor == null)
         {
@@ -73,13 +73,13 @@ public class DoctorService : IDoctorService
             throw new ArgumentException("One or more medicaments do not exist.");
         }
 
-        // Create prescription
+     
         var prescription = new Prescription
         {
             Date = request.Date,
             DueDate = request.DueDate,
             IdPatient = patient.IdPatient,
-            IdDoctor = doctor.IdDoctor // Ensure that doctor.IdDoctor is populated correctly
+            IdDoctor = doctor.IdDoctor 
         };
         _context.Prescriptions.Add(prescription);
         await _context.SaveChangesAsync();
